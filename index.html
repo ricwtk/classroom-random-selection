@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Classroom Random Selection</title>
+    <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet"> 
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/materialdesignicons.min.css">
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <div class="title">Randomly select someone in the classroom...</div>
+        <div class="mdi mdi-menu clickable" @click="toggleOverlay('settings')"></div>
+        <div class="mdi mdi-history clickable" @click="toggleOverlay('history')"></div>
+      </header>
+      <div id="class-view">
+        <div id="class-room" :style="classRoomStyle">
+          <div class="whiteboard" :style="{ left: selectedClassroomObject.whiteboard[0]+'%', top: selectedClassroomObject.whiteboard[1]+'%', width: selectedClassroomObject.whiteboard[2]+'%', height: selectedClassroomObject.whiteboard[3]+'%'}"></div>
+          <my-table v-for="(tl,i) in selectedClassroomObject.tableLocations"
+            ref="tables"
+            :key="'table'+i"
+            :table-location=tl
+            :table-size=selectedClassroomObject.tableSize[tl[0]]>
+          </my-table>
+          <my-chair v-for="(cl,i) in selectedClassroomObject.chairLocations"
+            ref="chairs"
+            :key="'chair'+i"
+            :chair-location=cl
+            :chair-size=selectedClassroomObject.chairSize[cl[0]]>
+          </my-chair>
+        </div>
+      </div>
+      <div id="controls">
+        <div class="clickable" @click="select">Select</div>
+        <div class="clickable" @click="clearSelect">Clear selection</div>
+        <div class="mdi mdi-dots-vertical"></div>
+        <div class="clickable" @click="allPresent">All present</div>
+        <div class="clickable" @click="allAbsent">All absent</div>
+        <div class="mdi mdi-dots-vertical"></div>
+        <div class="clickable" @click="clearHistory">Clear history</div>
+      </div>
+
+      <div id="settings" class="overlay" ref="settings" v-show="show.settings" @click.self="toggleOverlay('settings')">
+        <div id="settings-window" class="overlay-window">
+          <div class="label">Classroom</div>
+          <select class="set-control" v-model="selectedClassroom">
+            <option v-for="c in classroomTemplates">{{ c.name }}</option>
+          </select>
+          <div class="label">Selection number</div>
+          <input class="set-control" type="number" min="1" v-model="selectionNumber">
+        </div>
+      </div>
+
+      <div id="history" class="overlay" ref="history" v-show="show.history" @click.self="toggleOverlay('history')">
+        <div id="history-window" class="overlay-window">
+          <div id="history-list">
+            <div class="history-row" v-for="h in history">
+              <div class="history-entry" v-for="e in h">
+                {{ e }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/classroomtemplates.js"></script>
+    <script>
+      Vue.component("my-chair", {
+        props: ["chair-location", "chair-size"],
+        data: function () {
+          return {
+            isSelected: false,
+            isSeated: false,
+            allStyle: {
+              left: this.chairLocation[1] + '%',
+              top: this.chairLocation[2] + '%',
+              width: this.chairSize[0] + '%',
+              height: this.chairSize[1] + '%'
+            }
+          }
+        },
+        computed: {
+          allClass: function () {
+            return {
+              chair: true,
+              mdi: true,
+              "mdi-account": this.isSeated,
+              selected: this.isSelected
+            }
+          }
+        },
+        template: `
+          <div :class="allClass" :style="allStyle" @click="isSeated = !isSeated"></div>
+        `
+      });
+      Vue.component("my-table", {
+        props: ["table-location", "table-size"],
+        data: function () {
+          return {
+            allStyle: {
+              left: this.tableLocation[1] + '%',
+              top: this.tableLocation[2] + '%',
+              width: this.tableSize[0] + '%',
+              height: this.tableSize[1] + '%'
+            }
+          }
+        },
+        computed: {
+          allClass: function () {
+            return {
+              table: true,
+            }
+          }
+        },
+        template: `
+          <div :class="allClass" :style="allStyle"></div>
+        `
+      });
+      var app = new Vue({
+        el: "#app",
+        data: {
+          show: {
+            settings: false,
+            history: false
+          },
+          classroomTemplates: classrooms,
+          history: [],
+          selectionNumber: "1",
+          selectedClassroom: classrooms[0].name
+        },
+        computed: {
+          selectedClassroomObject: function () {
+            return this.classroomTemplates.find((cr) => cr.name == this.selectedClassroom);
+          },
+          classRoomStyle: function () {
+            return {
+              width: this.selectedClassroomObject.aspectRatio > 1.0 ? "100%" : this.selectedClassroomObject.aspectRatio*100 + "%",
+              height: this.selectedClassroomObject.aspectRatio < 1.0 ? "100%" : 100/this.selectedClassroomObject.aspectRatio + "%",
+            }
+          }
+        },
+        methods: {
+          toggleOverlay: function (refName) {
+            this.show[refName] = !this.show[refName];
+          },
+          clearSelect: function () {
+            this.$refs.chairs.forEach(x => x.isSelected = false);
+          },
+          allPresent: function () {
+            this.$refs.chairs.forEach(x => x.isSeated = true);
+          },
+          allAbsent: function () {
+            this.$refs.chairs.forEach(x => x.isSeated = false);
+          },
+          select: function () {
+            this.$refs.chairs.forEach(x => x.isSelected = false);
+            let seatedChairs = [];
+            this.$refs.chairs.forEach((x,i) => {
+              if (x.isSeated) {
+                seatedChairs.push(i);
+              }
+            });
+            if (seatedChairs.length > 0) {
+              let min = 0;
+              let max = seatedChairs.length;
+              let rand = Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+              this.$refs.chairs[seatedChairs[rand]].isSelected = true;
+              this.history.push([seatedChairs[rand]]);
+            }
+          },
+          clearHistory: function () {
+            this.history = [];
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

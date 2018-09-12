@@ -1,0 +1,130 @@
+* {
+  font-family: Karla;
+  margin: 0;
+  padding: 0;
+}
+#app {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  padding: 1em;
+  color: white;
+  background-color: #2196f3;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+header .title {
+  flex-grow: 1;
+}
+.clickable {
+  cursor: pointer;
+  padding: .5em;
+}
+.clickable:hover {
+  background-color: #00000011;
+}
+#class-view {
+  flex-grow: 1;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#class-room {
+  border: 1px solid lightgray;
+  position: relative;
+  /* height: 50%; */
+  /* width: 50%; */
+  overflow: hidden;
+}
+#class-room * {
+  position: absolute;
+}
+.whiteboard {
+  background-color: #607d8b;
+}
+.chair {
+  background-color: #26a69a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 150%;
+}
+.chair.selected {
+  color: #80cbc4;
+  background-color: #ff7043;
+}
+.table {
+  background-color: #a1887f;
+}
+#controls {
+  border-top: 1px solid lightgray;
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+  overflow: auto;
+  align-items: center;
+}
+#controls .clickable {
+  flex-shrink: 0;
+  border: 1px solid lightgray;
+  border-radius: 3px;
+}
+#controls *:not(:last-child) {
+  margin-right: .5em;
+}
+.overlay {
+  background-color: #000000AA;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.overlay-window {
+  background-color: white;
+  min-height: 100px;
+  min-width: 100px;
+  border-radius: 5px;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  max-width: 90vw;
+}
+.set-control:not(:last-child) {
+  margin-bottom: 1.5em;
+}
+#history-window {
+  height: 90vh;
+  width: 90vw;
+}
+#history-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: auto;
+}
+.history-row {
+  display: flex;
+  flex-direction: row;
+}
+.history-row:not(:last-child) {
+  margin-bottom: .5em;
+}
+.history-entry {
+  background-color: #0000001A;
+  padding: .5em;
+  border-radius: 3pt;
+}
+.history-entry:not(:last-child) {
+  margin-right: .5em;
+}
