@@ -130,16 +130,28 @@
           classroomTemplates: classrooms,
           history: [],
           selectionNumber: "1",
-          selectedClassroom: classrooms[0].name
+          selectedClassroom: classrooms[0].name,
+          classHeight: document.querySelector("#class-view").clientHeight,
+          classWidth: document.querySelector("#class-view").clientWidth,
         },
         computed: {
           selectedClassroomObject: function () {
             return this.classroomTemplates.find((cr) => cr.name == this.selectedClassroom);
           },
           classRoomStyle: function () {
+            let h = this.classHeight;
+            let w = this.selectedClassroomObject.aspectRatio * h;
+            if (w > this.classWidth) {
+              w = 100;
+              h = 100/this.selectedClassroomObject.aspectRatio;
+            } else {
+              w = this.selectedClassroomObject.aspectRatio * this.classHeight / this.classWidth * 100;
+              h = w/this.selectedClassroomObject.aspectRatio;
+            }
             return {
-              width: this.selectedClassroomObject.aspectRatio > 1.0 ? "100%" : this.selectedClassroomObject.aspectRatio*100 + "%",
-              height: this.selectedClassroomObject.aspectRatio < 1.0 ? "100%" : 100/this.selectedClassroomObject.aspectRatio + "%",
+              width: w + "%",
+              // height: this.selectedClassroomObject.aspectRatio < 1.0 ? "100%" : 100/this.selectedClassroomObject.aspectRatio + "%",
+              paddingTop: h + "%",
             }
           }
         },
@@ -176,6 +188,10 @@
             this.history = [];
           }
         }
+      });
+      window.addEventListener("resize", () => {
+        app.classHeight = document.querySelector("#class-view").clientHeight;
+        app.classWidth = document.querySelector("#class-view").clientWidth;
       });
     </script>
   </body>

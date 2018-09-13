@@ -13,7 +13,7 @@
 var classrooms = [
   {
     name: "UC-8-14",
-    aspectRatio: 1.0,
+    aspectRatio: 1.5,
     whiteboard: [5,0,90,2],
     chairSize: [[5,5]],
     tableSize: [[40,5]],

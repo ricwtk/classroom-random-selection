@@ -33,12 +33,11 @@ header .title {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 #class-room {
   border: 1px solid lightgray;
   position: relative;
-  /* height: 50%; */
-  /* width: 50%; */
   overflow: hidden;
 }
 #class-room * {
